@@ -1,3 +1,3 @@
 module github.com/Coresummer/bls-go-binary
 
-go 1.12
+go 1.13
