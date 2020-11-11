@@ -1,3 +1,3 @@
-module github.com/herumi/bls-go-binary
+module github.com/Coresummer/bls-go-binary
 
 go 1.12
