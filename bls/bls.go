@@ -446,6 +446,16 @@ func (pub *PublicKey) Recover(pubVec []PublicKey, idVec []ID) error {
 	return nil
 }
 
+// LoopVerifyAggregateHashes --
+func (pub *PublicKey) LoopVerifyAggregateHashes(preE1 []byte, hash []byte) []byte {
+	if len(hash) == 0 || preE1 == nil || pub == nil {
+		return nil
+	}
+
+	C.loop_blsVerifyAggregatedHashes(unsafe.Pointer(&preE1[0]), unsafe.Pointer(&hash[0]), &pub.v, C.mclSize(len(hash)))
+	return preE1
+}
+
 // Sign  --
 type Sign struct {
 	v C.blsSignature
@@ -663,6 +673,18 @@ func (sig *Sign) VerifyAggregateHashes(pubVec []PublicKey, hash [][]byte) bool {
 		copy(h[i*hashByte:(i+1)*hashByte], hash[i][0:min(hn, hashByte)])
 	}
 	return C.blsVerifyAggregatedHashes(&sig.v, &pubVec[0].v, unsafe.Pointer(&h[0]), C.mclSize(hashByte), C.mclSize(n)) == 1
+}
+
+// PreVerifyAggregateHashes --
+func (sig *Sign) PreVerifyAggregateHashes(e2 []byte) []byte {
+
+	C.pre_blsVerifyAggregatedHashes(unsafe.Pointer(&e2[0]), &sig.v)
+	return e2
+}
+
+// FinalVerifyAggregateHashes --
+func (sig *Sign) FinalVerifyAggregateHashes(e1 []byte, e2 []byte) bool {
+	return C.final_blsVerifyAggregatedHashes(unsafe.Pointer(&e1[0]), unsafe.Pointer(&e2[0])) == 1
 }
 
 // SignatureVerifyOrder --
